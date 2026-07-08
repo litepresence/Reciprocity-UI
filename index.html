@@ -1,0 +1,278 @@
+<!-- SPDX-License-Identifier: MIT -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reciprocity Pool</title>
+<link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+<div id="app">
+
+<header>
+  <div class="header-content">
+    <img id="reciprocity-logo" src="img/logos/reciprocity.png" alt="Reciprocity logo" class="brand-logo">
+    <div class="header-text">
+      <span class="brand">Reciprocity</span>
+      <span class="subtitle">n-Asset Swap Protocol</span>
+    </div>
+  </div>
+</header>
+
+<div id="pool-discovery">
+<div id="empty-dashboard">
+      <div class="dashboard-hero">
+        <h2 class="dashboard-tagline">Join the Pool Party</h2>
+        <p class="dashboard-subtitle">n-Asset Geometric Mean Invariant AMM</p>
+      </div>
+      <div class="dashboard-stats">
+        <div class="stat-card">
+          <div class="stat-value">15</div>
+          <div class="stat-label">Chains</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">&#8734;</div>
+          <div class="stat-label">Assets</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">0%</div>
+          <div class="stat-label">Fee Split</div>
+        </div>
+      </div>
+      <div class="dashboard-cta">
+        <button id="enter-engine-btn" class="btn-primary-lg">Enter Engine Address</button>
+      </div>
+    </div>
+    <div id="connection-form" style="display:none">
+      <div id="stepper">
+        <div class="step active" data-step="1"><span class="step-num">1</span> Connect</div>
+        <div class="step" data-step="2"><span class="step-num">2</span> Factory</div>
+        <div class="step" data-step="3"><span class="step-num">3</span> Pool</div>
+        <div class="step" data-step="4"><span class="step-num">4</span> Trade</div>
+      </div>
+      <h3 id="step-heading">Select a chain and connect your wallet</h3>
+      <div class="discovery-row step-section" data-requires="1">
+        <label>Blockchain</label>
+    <select id="chain-select">
+      <option value="evm" data-logo="img/logos/ethereum.svg" data-network="sepolia">Ethereum</option>
+      <option value="solana" data-logo="img/logos/solana.svg" data-network="devnet">Solana</option>
+      <option value="avalanche" data-logo="img/logos/avalanche.svg" data-network="fuji">Avalanche</option>
+      <option value="aptos" data-logo="img/logos/aptos.svg" data-network="testnet">Aptos</option>
+      <option value="sui" data-logo="img/logos/sui.svg" data-network="testnet">Sui</option>
+      <option value="near" data-logo="img/logos/near.svg" data-network="testnet">NEAR</option>
+      <option value="ton" data-logo="img/logos/ton.svg" data-network="testnet">TON</option>
+      <option value="algorand" data-logo="img/logos/algorand.svg" data-network="testnet">Algorand</option>
+      <option value="flow" data-logo="img/logos/flow.svg" data-network="testnet">Flow</option>
+      <option value="aleo" data-logo="img/logos/aleo.svg" data-network="testnet">Aleo</option>
+      <option value="cosmos" data-logo="img/logos/cosmos.svg" data-network="osmo_test_5">Cosmos</option>
+      <option value="soroban" data-logo="img/logos/stellar.svg" data-network="futurenet">Stellar</option>
+      <option value="cairo" data-logo="img/logos/starknet.svg" data-network="sepolia">StarkNet</option>
+      <option value="bitshares" data-logo="img/logos/bitshares.svg" data-network="testnet">BitShares</option>
+      <option value="python-float" data-logo="img/logos/python.svg" data-network="python-demo">Python Float (Demo)</option>
+      <option value="python-integer" data-logo="img/logos/python.svg" data-network="python-demo">Python Integer (Demo)</option>
+    </select>
+    <button id="connect-btn">Connect to Blockchain</button>
+    <span id="wallet-info">not connected</span>
+  </div>
+  <div class="discovery-row step-section" data-requires="2">
+    <label>Network</label>
+    <input type="text" id="network-input" placeholder="localhost, devnet, sepolia...">
+  </div>
+  <div class="discovery-row step-section" data-requires="2">
+    <label>Factory</label>
+    <input type="text" id="factory-addr" list="factory-list" placeholder="Select or type factory address" disabled>
+    <button id="discover-btn" disabled>Discover Contracts</button>
+  </div>
+  <datalist id="factory-list"></datalist>
+  <div id="pool-list"></div>
+  <div class="discovery-row step-section" data-requires="2">
+    <label>Pool</label>
+    <input type="text" id="pool-addr" placeholder="Paste pool address or select from list below" disabled>
+    <button id="connect-pool-btn" disabled>Join Pool</button>
+    </div>
+    </div>
+    <div class="status-row"><span class="label">LP Token</span><span class="value" id="status-lp">&mdash;</span></div>
+    <div class="status-row"><span class="label">Assets</span><span class="value" id="status-assets">&mdash;</span></div>
+    <div class="status-row"><span class="label">Weights</span><span class="value" id="status-weights">&mdash;</span></div>
+  </div>
+
+<div id="error-banner">
+  <div class="err-title" id="error-title">Error</div>
+  <div id="error-message"></div>
+</div>
+
+<div class="panels step-section" data-requires="4">
+  <div class="panel">
+    <h3>Your Wallet</h3>
+    <div id="wallet-balances"></div>
+  </div>
+  <div class="panel">
+    <h3>Reciprocity Pool</h3>
+    <div id="pool-balances"></div>
+    <div id="lp-analytics" style="display:none">
+      <div class="section-label">LP Analytics</div>
+      <div class="row"><span class="sym">My LP Value</span><span class="val" id="lp-value">—</span></div>
+      <div class="row"><span class="sym">Pool Share</span><span class="val" id="lp-share">—</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="input-section" class="step-section" data-requires="4">
+  <div class="give-panel">
+    <h3>Give</h3>
+    <div id="give-container"></div>
+  </div>
+
+  <div class="request-panel">
+    <h3>Request</h3>
+    <div id="request-container"></div>
+    <div class="verify-toggle-row">
+      <label class="verify-toggle">
+        <input type="checkbox" id="verify-toggle" checked>
+        <span class="verify-toggle-label">Verify on-chain</span>
+      </label>
+    </div>
+  </div>
+  <span id="validation-msg">Insufficient pool liquidity</span>
+</div>
+
+<div id="output" class="step-section" data-requires="4"><span class="info">Connect your wallet and select a pool to begin.</span></div>
+
+<div id="preview-card" class="step-section" data-requires="4">
+  <div class="preview-header">Verified Offer</div>
+  <label id="details-toggle" class="details-toggle hidden"><input type="checkbox" id="details-checkbox"> Show breakdown</label>
+  <div id="preview-content"></div>
+</div>
+
+<div id="actions" class="step-section" data-requires="4">
+  <button id="execute-btn" disabled>Accept Offer</button>
+</div>
+
+<div id="chart-container" class="step-section" data-requires="4">
+  <div class="chart-header">
+    <h3>Price Chart</h3>
+    <div class="chart-resolution">
+      <button class="res-btn active" data-res="15">15m</button>
+      <button class="res-btn" data-res="60">1h</button>
+      <button class="res-btn" data-res="240">4h</button>
+      <button class="res-btn" data-res="1D">1D</button>
+    </div>
+  </div>
+  <div id="chart-canvas"></div>
+</div>
+
+<div id="network-graph">
+  <div class="network-header">
+    <h3>Network Graph</h3>
+    <div class="view-toggle">
+      <span class="toggle-option active" data-view="all">All Pools</span>
+      <span class="toggle-option" data-view="single">Single Pool</span>
+      <span class="toggle-option" data-view="provenance">Provenance</span>
+    </div>
+  </div>
+  <div id="token-selector" class="token-selector" style="display:none">
+    <input id="token-search" type="text" placeholder="Add token to graph..." autocomplete="off">
+    <div id="token-dropdown" class="token-dropdown"></div>
+    <div id="selected-tokens" class="selected-tokens"></div>
+  </div>
+  <canvas id="network-canvas"></canvas>
+</div>
+<div id="network-tooltip">
+  <div class="tt-title" id="tt-title"></div>
+  <div id="tt-content"></div>
+</div>
+
+<footer>
+  <p>
+    <a href="admin/" title="Admin" id="admin-link"><img src="img/logos/admin.png" alt="Admin" width="36" height="36"></a>
+    <a href="https://github.com/litepresence/reciprocity-ui" target="_blank" title="GitHub" id="github-link">
+      <svg viewBox="0 0 16 16" fill="currentColor" width="36" height="36">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+      </svg>
+    </a>
+    <a id="explorer-link" href="#" target="_blank" title="Explorer">
+      <img id="footer-chain-logo" src="" alt="" width="36" height="36">
+    </a>
+  </p>
+</footer>
+
+<div id="toast-container"></div>
+
+</div>
+
+<script src="lib/ethers.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk@16.0.1/dist/stellar-sdk.min.js"></script>
+<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="js/constants.js?v=2"></script>
+<script src="js/core.js?v=2"></script>
+<script src="js/optimizer.js?v=2"></script>
+<script src="js/quote_math.js?v=2"></script>
+<script src="js/base_wrapper.js?v=2"></script>
+<script src="wrappers/python-float.js?v=2"></script>
+<script src="wrappers/python-integer.js?v=2"></script>
+<script src="wrappers/solana.js?v=2"></script>
+<script src="wrappers/evm.js?v=2"></script>
+<script src="wrappers/avalanche.js?v=2"></script>
+<script src="wrappers/algorand.js?v=2"></script>
+<script src="wrappers/near.js?v=2"></script>
+<script src="wrappers/ton.js?v=2"></script>
+<script src="wrappers/cosmos.js?v=2"></script>
+
+<script src="wrappers/cairo.js?v=2"></script>
+<script src="wrappers/soroban.js?v=2"></script>
+<script src="wrappers/sui.js?v=2"></script>
+<script src="wrappers/aptos.js?v=2"></script>
+<script src="wrappers/flow.js?v=2"></script>
+<script src="wrappers/aleo.js?v=2"></script>
+<script src="wrappers/bitshares.js?v=2"></script>
+<script src="js/networkx.js?v=2"></script>
+<script src="js/dom_helpers.js?v=2"></script>
+<script src="js/notifications.js?v=2"></script>
+<script src="js/pool.js?v=2"></script>
+<script src="js/preview.js?v=2"></script>
+<script src="js/transactions.js?v=2"></script>
+<script src="js/charts.js?v=2"></script>
+<script src="js/ui.js?v=2"></script>
+<script>
+(function() {
+
+  var params = new URLSearchParams(window.location.search);
+  var chainSelect = document.getElementById('chain-select');
+  var chain = params.get('chain') || localStorage.getItem('reciprocity_chain') || 'evm';
+  var network = params.get('network') || chainSelect.querySelector('option[value="' + chain + '"]')?.getAttribute('data-network') || 'sepolia';
+  var api = window['chainAPI_' + chain];
+  if (!api && chain === 'evm') api = window.chainAPI;
+  if (typeof api !== 'object') {
+    document.getElementById('connect-btn').disabled = true;
+    document.getElementById('output').innerHTML =
+      '<span class="err">Chain wrapper not found: ' + chain + '</span>';
+    return;
+  }
+  if (api.setNetwork) {
+    try { api.setNetwork(network); } catch (e) {
+      document.getElementById('output').innerHTML =
+        '<span class="err">Network error: ' + e.message + '</span>';
+      return;
+    }
+  }
+  api.loadSDK().then(function(ok) {
+    if (!ok) throw new Error('SDK load failed');
+    if (typeof window.initUI !== 'function') {
+      document.getElementById('output').innerHTML =
+        '<span class="err">initUI is ' + typeof window.initUI + ' — check console for errors in ui.js</span>';
+      return;
+    }
+    window.initUI(api);
+    document.getElementById('explorer-link').href = api.explorer || '#';
+    document.getElementById('footer-chain-logo').src = api.logo || '';
+    document.getElementById('footer-chain-logo').alt = (api.name || 'Chain') + ' logo';
+  }).catch(function(e) {
+    document.getElementById('connect-btn').disabled = true;
+    document.getElementById('output').innerHTML =
+      '<span class="err">Failed to initialize ' + chain + ': ' + e.message + '</span>';
+  });
+})();
+</script>
+</body>
+</html>
